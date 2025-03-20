@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const senhaHash = await bcrypt.hash(senha, salt);
     const user = await UserModel.createUser(nome, email, senhaHash);
-
+    console.log(user)
     res.status(201).json({ success: true, message: "Usuário cadastrado!", user }); // ✅ Sem `return`
   } catch (error) {
     res.status(500).json({ success: false, message: "Erro ao cadastrar usuário." });

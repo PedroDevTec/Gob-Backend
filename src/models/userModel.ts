@@ -7,6 +7,7 @@ export default class UserModel {
       "INSERT INTO users (nome, email, senha) VALUES ($1, $2, $3) RETURNING *",
       [nome, email, senhaHash]
     );
+    console.log(result.rows[0]);
     return result.rows[0];
   }
 
