@@ -1,5 +1,6 @@
 export interface IUser {
-    id?: number;
+  id?: string;  // ✅ Agora 'id' está definido corretamente como string
+
     nome: string;
     email: string;
     senha: string;
@@ -12,6 +13,6 @@ export interface IUser {
   }
   
   export interface ITokenPayload {
-    id: number;
+    id: string;
   }
   

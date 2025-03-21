@@ -1,23 +1,23 @@
-import pool from "../config/db";
+import prisma from "../config/db";
 import { IUser } from "../types/userTypes";
 
 export default class UserModel {
   static async createUser(nome: string, email: string, senhaHash: string): Promise<IUser> {
-    const result = await pool.query(
-      "INSERT INTO users (nome, email, senha) VALUES ($1, $2, $3) RETURNING *",
-      [nome, email, senhaHash]
-    );
-    console.log(result.rows[0]);
-    return result.rows[0];
+    console.log("Usuário cadastrado:", nome, email, senhaHash);
+
+    return await prisma.user.create({
+      data: { nome, email, senha: senhaHash },
+      
+    });
   }
 
   static async findByEmail(email: string): Promise<IUser | null> {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    return result.rows[0] || null;
+    return await prisma.user.findUnique({ where: { email } });
   }
 
   static async getAllUsers(): Promise<IUser[]> {
-    const result = await pool.query("SELECT id, nome, email FROM users");
-    return result.rows;
+    return await prisma.user.findMany({
+      select: { id: true, nome: true, email: true, senha: true },
+    });
   }
 }
