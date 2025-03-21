@@ -15,8 +15,103 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  nome  String
-  email String @unique
-  senha String
+  id         String      @id @default(uuid())
+  nome       String
+  email      String      @unique
+  senha      String
+  characters Character[] @relation("UserToCharacter")
+}
+
+model Character {
+  id           String        @id @default(uuid())
+  userId       String
+  name         String
+  level        Int           @default(1)
+  inventoryId  String?       @unique
+  classId      String
+  createdAt    DateTime      @default(now())
+  user         User          @relation("UserToCharacter", fields: [userId], references: [id])
+  inventory    Inventory?    @relation(fields: [inventoryId], references: [id])
+  class        Class         @relation("ClassToCharacter", fields: [classId], references: [id])
+  transactions Transaction[] @relation
+}
+
+model Inventory {
+  id         String      @id @default(uuid())
+  coins      Int         @default(0)
+  items      Item[]
+  equipments Equipment[]
+  character  Character?  @relation
+
+  characterId String? @unique
+}
+
+model Item {
+  id          String  @id @default(uuid())
+  name        String
+  value       Int
+  category    String
+  type        String
+  img         String
+  effect      String?
+  quantity    Int     @default(1)
+  inventoryId String
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+  monster   Monster?  @relation
+
+  monsterId String?
+}
+
+model Equipment {
+  id          String  @id @default(uuid())
+  name        String
+  value       Int
+  category    String
+  type        String
+  img         String
+  effect      String?
+  inventoryId String
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+}
+
+model Class {
+  id          String      @id @default(uuid())
+  name        String
+  modifier    String
+  description String
+  passive     String?
+  characters  Character[] @relation("ClassToCharacter")
+}
+
+model BountyHunt {
+  id        String   @id @default(uuid())
+  monsterId String
+  reward    Int
+  timeLimit DateTime
+  status    String
+}
+
+model Monster {
+  id         String  @id @default(uuid())
+  name       String
+  level      Int
+  health     Int
+  attack     Int
+  defense    Int
+  experience Int
+  dropItemId String? @unique
+
+  dropItem Item? @relation(fields: [dropItemId], references: [id])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  characterId String
+  type        String
+  value       Int
+  createdAt   DateTime @default(now())
+
+  character Character @relation(fields: [characterId], references: [id])
 }

@@ -1,46 +1,43 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import UserModel from "../models/userModel";
-import { IUserLogin, ITokenPayload, IUser } from "../types/userTypes";
-import { JWT_SECRET } from "../config/env";
+import UserModel from "./user.models";
+import { IUserLogin, ITokenPayload, IUser } from "../../types/userTypes";
+import { JWT_SECRET } from "../../config/env";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  console.log(req.body, "Body recebido no Postman");
+  console.log("🚀 Body recebido:", req.body); // 🔹 Verifica se o body chega corretamente
 
-  const { nome, email, senha }: IUserLogin = req.body;
+  const { nome, email, senha } = req.body;
+  console.log("Nome:", nome, "Email:", email, "Senha:", senha); // 🔹 Verifica os valores recebidos
+
+  if (!nome || !email || !senha) {
+    res.status(400).json({ success: false, message: "Todos os campos são obrigatórios!" });
+    return;
+  }
 
   try {
-    // Verifica se o email já está cadastrado
     const userExists = await UserModel.findByEmail(email);
     if (userExists) {
       res.status(400).json({ success: false, message: "E-mail já cadastrado!" });
       return;
     }
 
-    // Hash da senha
     const salt = await bcrypt.genSalt(10);
     const senhaHash = await bcrypt.hash(senha, salt);
 
-    // Criar usuário no banco de dados e garantir que o ID seja retornado
     const user: IUser = await UserModel.createUser(nome, email, senhaHash);
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
-    if (!user.id) {
-      res.status(500).json({ success: false, message: "Erro ao obter ID do usuário." });
-      return;
-    }
-
-    // Criar token JWT com ID correto
-    const token = jwt.sign({ id: user.id } as ITokenPayload, JWT_SECRET, { expiresIn: "1h" });
-
-    console.log("Usuário cadastrado:", user);
+    console.log("✅ Usuário cadastrado com sucesso:", user);
 
     res.status(201).json({ success: true, message: "Usuário cadastrado!", token, user });
   } catch (error) {
-    console.error("Erro ao cadastrar usuário:", error);
+    console.error("❌ Erro ao cadastrar usuário:", error);
     res.status(500).json({ success: false, message: "Erro ao cadastrar usuário." });
   }
 };
+
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, senha }: IUserLogin = req.body;
