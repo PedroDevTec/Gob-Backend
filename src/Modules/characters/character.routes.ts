@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { createCharacter } from "./character.controller";
-import auth from "../../middleware/auth"; // Middleware de autenticação
+// import { Router } from "express";
+// import { createCharacter } from "./character.controller";
+// import auth from "../../middleware/auth"; // Middleware de autenticação
 
-const router = Router();
+// const router = Router();
 
-router.post("/create", auth, createCharacter);
+// router.post("/create", auth, createCharacter);
 
-export default router;
+// export default router;
