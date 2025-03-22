@@ -1,9 +1,19 @@
-// import { Router } from "express";
-// import { createCharacter } from "./character.controller";
-// import auth from "../../middleware/auth"; // Middleware de autenticação
+import { Router } from "express";
+import { getCharacters, createCharacter, updateCharacter, deleteCharacter } from "./character.controller";
+import auth from "../../middleware/auth";
 
-// const router = Router();
+const router = Router();
 
-// router.post("/create", auth, createCharacter);
+// Criar personagem
+router.post("/create", auth, createCharacter);
 
-// export default router;
+// Atualizar personagem (ex: progresso, XP, etc.)
+router.put("/:id", auth, updateCharacter);
+
+// Deletar personagem
+router.delete("/:id", auth, deleteCharacter);
+
+// (Opcional) Listar personagens do usuário
+ router.get("/", auth, getCharacters);
+
+export default router;
